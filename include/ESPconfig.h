@@ -12,6 +12,7 @@ public:
     uint8_t updateIP();
     uint8_t updateServer();
     uint8_t getStrapping();
+    uint8_t updateRate();
 
     class GPIO_Definitions{
         public:
@@ -23,7 +24,7 @@ public:
             uint8_t CAN_RX = 1;
             uint8_t CAN_TX = 2;
             uint8_t FLOW_PIN = 34;
-            
+            uint8_t sectionPins[5] = {14, 13, 12, 11, 10};
             GPIO_Definitions(){}
     };
     GPIO_Definitions gpioDefs;
@@ -51,6 +52,7 @@ public:
             uint8_t state;
             uint8_t adsState;
             uint8_t confRes;
+            uint8_t canState;
             ProgramData(){}
     };
     ProgramData progData;
@@ -83,9 +85,74 @@ public:
             uint16_t flowCalNumber = 200;
             uint16_t minFlow = 1;
             uint16_t maxFlow = 100;
+            float flowRate = 1.0;
             FlowMeterConfig(){}
     };
     FlowMeterConfig flowCfg;
+
+    class RegData {
+        public:
+            uint8_t state;
+            uint16_t currentPosition;
+            uint16_t targetPosition;
+            uint8_t speed;
+            uint32_t lastMsgRecieved;
+            uint32_t cmdID = 0x18EFB480;
+            
+            struct __attribute__ ((packed)) regReport_Struct_t{
+                uint64_t position : 16;
+                uint8_t valve_status : 8;
+                uint8_t valve_alarms_1 : 8;
+                uint8_t valve_alarms_2 : 8;
+            };
+            
+            union regReport_u{
+                regReport_Struct_t regReport_Struct;
+                uint8_t bytes[sizeof(regReport_Struct_t)];
+            } regReport;
+            
+            struct __attribute__ ((packed)) regID_Struct_t{
+                uint32_t id : 32;
+            };
+            
+            union regID_u{
+                regID_Struct_t regID_Struct;
+                uint8_t bytes[sizeof(regID_Struct_t)];
+            } regID;
+
+            struct __attribute__ ((packed)) regCommand_Struct_t{
+                uint64_t byte_1 : 8;
+                uint64_t dic_index_1 : 8;
+                uint64_t dic_index_2 : 8;
+                uint64_t sub_index : 8;
+                uint64_t byte_5 : 8;
+                uint64_t movement_speed : 8;
+                uint64_t target : 16;
+            };
+            union regCommand_u{
+                regCommand_Struct_t regCommandStruct;
+                uint8_t bytes[sizeof(regCommand_Struct_t)];
+            } regCommand;
+            RegData(){}
+    };
+    RegData regData;
+
+    class RateData {
+        public:
+            uint32_t lastSectionMsg;
+            float speed;
+            uint8_t sectionStates[65];
+            uint8_t state;
+            uint8_t regState;
+            float targetRate;
+            float targetFlowRate;
+            float targetRowFlowRate;
+            float actualFlowRate;
+            float targetPressure;
+            float targetPressureOffset;
+            RateData(){}
+    };
+    RateData rateData;
 
     ESPconfig(/* args */);
     

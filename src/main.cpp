@@ -7,8 +7,10 @@
 #include <ESPAsyncWebServer.h>
 #include "ESP32OTAPull.h"
 #include "ESPudp.h"
-
+#include "ArduinoJson.h"
+#include "Product_Ctrl.h"
 #include "driver/temp_sensor.h"
+#include "CANBUS.h"
 
 
 // TwoWire twoWire = TwoWire(0);
@@ -20,11 +22,14 @@ bool foldCenterWingsState = false;
 bool raiseWingsState = false;
 
 
+
 ESPconfig espConfig;
+
+CANBUS canbus(&espConfig);
 MyLED myLED(&espConfig);
 ESPWifi espWifi(&espConfig);
 ESPudp espUdp(&espConfig);
-
+Product_Ctrl productCtrl(&espConfig, &canbus);
 std::vector<String> debugVars;
 AsyncWebServer server(80);
 
@@ -76,9 +81,20 @@ void updateDebugVars() {
   debugVars.push_back("IP Address: " + String(wifiCfg.ips[0])+"."+String(wifiCfg.ips[1])+"."+String(wifiCfg.ips[2])+"."+String(wifiCfg.ips[3]));
   debugVars.push_back("Wifi State: " + String(wifiCfg.state));
   debugVars.push_back("Program State: " + String(progData.state));
-  
-
-
+  debugVars.push_back("TargetRate: " + String(espConfig.rateData.targetRate));
+  debugVars.push_back("Flow Rate: " + String(espConfig.flowCfg.flowRate));
+  debugVars.push_back("Fold Outer Wings: " + String(foldOuterWingsState ? "ON" : "OFF"));
+  debugVars.push_back("Sec 1: " + String(espConfig.rateData.sectionStates[0]));
+  debugVars.push_back("Sec 2: " + String(espConfig.rateData.sectionStates[1]));
+  debugVars.push_back("Sec 3: " + String(espConfig.rateData.sectionStates[2]));
+  debugVars.push_back("Sec 4: " + String(espConfig.rateData.sectionStates[3]));
+  debugVars.push_back("Sec 5: " + String(espConfig.rateData.sectionStates[4]));
+  debugVars.push_back("Target Pressure: " + String(espConfig.rateData.targetPressure));
+  debugVars.push_back("Target Flow Rate: " + String(espConfig.rateData.targetFlowRate));
+  debugVars.push_back("Actual Flow Rate: " + String(espConfig.rateData.actualFlowRate));
+  debugVars.push_back("Target Row Flow Rate: " + String(espConfig.rateData.targetRowFlowRate));
+  debugVars.push_back("Speed: " + String(espConfig.rateData.speed));
+  debugVars.push_back("Last Section Msg: " + String(espConfig.rateData.lastSectionMsg));
   
   
 
@@ -169,35 +185,33 @@ void handleFileUpload(AsyncWebServerRequest *request, String filename, size_t in
 }
 
 void handleMomentaryCommand(AsyncWebServerRequest *request) {
-  Serial.println("got Momentary Command");
-  // if (request->hasParam("button") && request->hasParam("action")) {
-  //   String button = request->getParam("button")->value();
-  //   String action = request->getParam("action")->value();
+  if (request->hasParam("button") && request->hasParam("action")) {
+    String button = request->getParam("button")->value();
+    String action = request->getParam("action")->value();
 
-  //   Serial.printf("Momentary Command: Button=%s, Action=%s\n", button.c_str(), action.c_str());
+    Serial.printf("Momentary Command: Button=%s, Action=%s\n", button.c_str(), action.c_str());
 
-  //   // Add your logic here to handle the momentary button actions
-  //   if (action == "start") {
-  //     // Start the action for the button
-  //     Serial.printf("Starting action for button: %s\n", button.c_str());
-  //   } else if (action == "stop") {
-  //     // Stop the action for the button
-  //     Serial.printf("Stopping action for button: %s\n", button.c_str());
-  //   } else {
-  //     Serial.println("Unknown action received for momentary command.");
-  //   }
+    // Add your logic here to handle the momentary button actions
+    if (button == "LeftFlipOut") {
+      if (action == "start") {
+        // Start the action for LeftFlipOut
+        Serial.println("Starting LeftFlipOut");
+        // Add hardware control logic here
+      } else if (action == "stop") {
+        // Stop the action for LeftFlipOut
+        Serial.println("Stopping LeftFlipOut");
+        // Add hardware control logic here
+      } else {
+        Serial.println("Unknown action received for LeftFlipOut.");
+      }
+    } else {
+      Serial.println("Unknown button received.");
+    }
 
-  //   request->send(200, "text/plain", "Momentary command processed");
-  // } else {
-  //   request->send(400, "text/plain", "Invalid parameters");
-  // }
-}
-void handleToggleAPMode(AsyncWebServerRequest *request) {
-  static bool apModeState = false;
-  apModeState = !apModeState;
-  wifiCfg.apMode = apModeState ? 1 : 0;
-  Serial.printf("AP Mode State: %s\n", apModeState ? "ON" : "OFF");
-  request->send(200, "text/plain", apModeState ? "AP_Mode is ON" : "AP_Mode is OFF");
+    request->send(200, "text/plain", "Momentary command processed");
+  } else {
+    request->send(400, "text/plain", "Invalid parameters");
+  }
 }
 
 // Function to handle toggle switch commands
@@ -217,6 +231,97 @@ void handleToggleCommand(const String& command, const String& action) {
   } else {
       Serial.println("Unknown command received.");
   }
+}
+
+// Function to handle setting the application rate
+void handleSetApplicationRate(AsyncWebServerRequest *request) {
+  Serial.println("Received set application rate request");
+  if (request->hasParam("rate")){
+    String rateStr = request->getParam("rate")->value();
+    espConfig.rateData.targetRate = rateStr.toFloat();
+    Serial.println(espConfig.updateRate());
+    Serial.printf("Received rate: %f\n", espConfig.rateData.targetRate);
+    if (espConfig.rateData.targetRate > 0) {
+      // Add your logic here to set the application rate
+      Serial.printf("Application rate set to: %f\n", espConfig.rateData.targetRate);
+      request->send(200, "text/plain", "Application rate set successfully");
+    } else {
+      request->send(400, "text/plain", "Invalid rate value");
+    }
+    
+  }
+   
+}
+void handleGetApplicationRate(AsyncWebServerRequest *request) {
+  // Create a JSON response with the current application rate
+  StaticJsonDocument<100> doc;
+  doc["rate"] = espConfig.rateData.targetRate; // Replace with your variable holding the application rate
+
+  String jsonResponse;
+  serializeJson(doc, jsonResponse);
+
+  request->send(200, "application/json", jsonResponse);
+}
+
+void handleGetModuleState(AsyncWebServerRequest *request) {
+    // Example variables for module state, target position, and current position
+    int moduleState = 2; // Replace with your actual variable (1 = good, 2 = disconnected) TODO: Change to actual module state
+    float targetPosition = 50.0; // Replace with your actual target position TODO: Change to actual target position
+    float currentPosition = 48.5; // Replace with your actual current position TODO: Change to actual current position
+
+    // Map the module state to a string
+    String stateString = (moduleState == 1) ? "good" : "disconnected";
+
+    // Create a JSON response
+    StaticJsonDocument<200> doc;
+    doc["state"] = stateString;
+    doc["targetPosition"] = targetPosition;
+    doc["currentPosition"] = currentPosition;
+    doc["pressure"] = 0.0; // Replace with your actual pressure value TODO: Change to actual pressure value
+    doc["flowRate"] = 0.0; // Replace with your actual flow rate value TODO: Change to actual flow rate value
+    doc["level"] = 0.0; // Replace with your actual level value TODO: Change to actual level value
+
+    // Serialize the JSON response
+    String jsonResponse;
+    serializeJson(doc, jsonResponse);
+
+    // Send the JSON response
+    request->send(200, "application/json", jsonResponse);
+}
+
+void handleGetPerformanceVariables(AsyncWebServerRequest *request) {
+    Serial.println("Handling /performance/variables request...");
+
+    // Example variables for performance data
+    float pressureCurrent = 75.0; // Replace with your actual pressure current value
+    float pressureTarget = 100.0; // Replace with your actual pressure target value
+    float flowrateCurrent = 50.0; // Replace with your actual flowrate current value
+    float flowrateTarget = 60.0; // Replace with your actual flowrate target value
+    float levelCurrent = 30.0; // Replace with your actual level current value
+    float levelTarget = 40.0; // Replace with your actual level target value
+
+    // Create a JSON response
+    StaticJsonDocument<256> doc; // Adjust size based on the number of variables
+    doc["Pressure"]["current"] = pressureCurrent;
+    doc["Pressure"]["target"] = pressureTarget;
+    doc["Flowrate"]["current"] = flowrateCurrent;
+    doc["Flowrate"]["target"] = flowrateTarget;
+    doc["Level"]["current"] = levelCurrent;
+    doc["Level"]["target"] = levelTarget;
+
+    // Serialize the JSON response
+    String jsonResponse;
+    if (serializeJson(doc, jsonResponse) == 0) {
+        Serial.println("Failed to serialize JSON");
+        request->send(500, "application/json", "{\"error\":\"Failed to serialize JSON\"}");
+        return;
+    }
+
+    Serial.println("JSON response:");
+    Serial.println(jsonResponse);
+
+    // Send the JSON response
+    request->send(200, "application/json", jsonResponse);
 }
 #pragma endregion
 
@@ -271,46 +376,52 @@ void setup() {
         server.on("/upload", HTTP_POST, [](AsyncWebServerRequest *request) {}, handleFileUpload);
         server.on("/update", HTTP_POST, [](AsyncWebServerRequest *request) {}, handleFirmwareUpload);
 
-        server.on("/toggleAPMode", HTTP_POST, handleToggleAPMode); // Add this line
-        // Define the endpoint to handle toggle switch commands
-    server.on("/foldOuterWings/on", HTTP_POST, [](AsyncWebServerRequest *request) {
-      handleToggleCommand("foldOuterWings", "on");
-      request->send(200, "text/plain", "Fold Outer Wings ON");
-  });
+        
+        server.on("/foldOuterWings/on", HTTP_POST, [](AsyncWebServerRequest *request) {
+          handleToggleCommand("foldOuterWings", "on");
+          request->send(200, "text/plain", "Fold Outer Wings ON");
+        });
 
-  server.on("/foldOuterWings/off", HTTP_POST, [](AsyncWebServerRequest *request) {
-      handleToggleCommand("foldOuterWings", "off");
-      request->send(200, "text/plain", "Fold Outer Wings OFF");
-  });
+        server.on("/foldOuterWings/off", HTTP_POST, [](AsyncWebServerRequest *request) {
+            handleToggleCommand("foldOuterWings", "off");
+            request->send(200, "text/plain", "Fold Outer Wings OFF");
+        });
 
-  server.on("/foldCenterWings/on", HTTP_POST, [](AsyncWebServerRequest *request) {
-      handleToggleCommand("foldCenterWings", "on");
-      request->send(200, "text/plain", "Fold Center Wings ON");
-  });
+        server.on("/foldCenterWings/on", HTTP_POST, [](AsyncWebServerRequest *request) {
+            handleToggleCommand("foldCenterWings", "on");
+            request->send(200, "text/plain", "Fold Center Wings ON");
+        });
 
-  server.on("/foldCenterWings/off", HTTP_POST, [](AsyncWebServerRequest *request) {
-      handleToggleCommand("foldCenterWings", "off");
-      request->send(200, "text/plain", "Fold Center Wings OFF");
-  });
+        server.on("/foldCenterWings/off", HTTP_POST, [](AsyncWebServerRequest *request) {
+            handleToggleCommand("foldCenterWings", "off");
+            request->send(200, "text/plain", "Fold Center Wings OFF");
+        });
 
-  server.on("/raiseWings/on", HTTP_POST, [](AsyncWebServerRequest *request) {
-      handleToggleCommand("raiseWings", "on");
-      request->send(200, "text/plain", "Raise Wings ON");
-  });
+        server.on("/raiseWings/on", HTTP_POST, [](AsyncWebServerRequest *request) {
+            handleToggleCommand("raiseWings", "on");
+            request->send(200, "text/plain", "Raise Wings ON");
+        });
 
-  server.on("/raiseWings/off", HTTP_POST, [](AsyncWebServerRequest *request) {
-      handleToggleCommand("raiseWings", "off");
-      request->send(200, "text/plain", "Raise Wings OFF");
-  });
-  server.on("/momentary/leftFlipIn", HTTP_POST, handleMomentaryCommand);
+        server.on("/raiseWings/off", HTTP_POST, [](AsyncWebServerRequest *request) {
+            handleToggleCommand("raiseWings", "off");
+            request->send(200, "text/plain", "Raise Wings OFF");
+        });
+        server.on("/momentary", HTTP_POST, handleMomentaryCommand);
+        server.on("/setApplicationRate", HTTP_POST, handleSetApplicationRate);
+        server.on("/getApplicationRate", HTTP_GET, handleGetApplicationRate);
+        server.on("/module", HTTP_GET, handleGetModuleState);
+        server.on("/performance", HTTP_GET, handleGetPerformanceVariables);
+        
         #pragma endregion
         
         
         // Start server
         server.begin();
       #pragma endregion
-      temp_sensor_start();
-      
+  temp_sensor_start();
+  espUdp.begin();
+  canbus.begin();
+  productCtrl.begin();
     
   
   
@@ -341,5 +452,5 @@ void loop(){
   delay(1000);
   debugPrint();
 }
- 
+
 

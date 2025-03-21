@@ -4,6 +4,6 @@
 #include "Arduino.h"
 
 #define VERSION "1.1.001"
-#define NAME "ESP32_Rotary_Sensor"
+#define NAME "ESP32_Product_Controller"
 
 #endif

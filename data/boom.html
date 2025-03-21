@@ -98,80 +98,80 @@
     <h1>Boom Control</h1>
     <div class="switch-container">
         <label class="switch">
-            <input type="checkbox" id="foldOuterWings" onchange="sendCommand('foldOuterWings', this.checked)">
+            <input type="checkbox" id="foldOuterWings" onchange="handleToggleChange('foldOuterWings', this.checked)">
             <span class="slider"></span>
         </label>
         <span class="switch-label">Fold Outer Wings</span>
     </div>
     <div class="switch-container">
         <label class="switch">
-            <input type="checkbox" id="foldCenterWings" onchange="sendCommand('foldCenterWings', this.checked)">
+            <input type="checkbox" id="foldCenterWings" onchange="handleToggleChange('foldCenterWings', this.checked)">
             <span class="slider"></span>
         </label>
         <span class="switch-label">Fold Center Wings</span>
     </div>
     <div class="switch-container">
         <label class="switch">
-            <input type="checkbox" id="raiseWings" onchange="sendCommand('raiseWings', this.checked)">
+            <input type="checkbox" id="raiseWings" onchange="handleToggleChange('raiseWings', this.checked)">
             <span class="slider"></span>
         </label>
         <span class="switch-label">Raise Wings</span>
     </div>
     <div class="button-grid">
-        <button onmousedown="sendMomentaryCommand('buttonLeftFlipOut', 'start')" onmouseup="sendMomentaryCommand('buttonLeftFlipOut', 'stop')" 
-                ontouchstart="sendMomentaryCommand('buttonLeftFlipOut', 'start')" ontouchend="sendMomentaryCommand('buttonLeftFlipOut', 'stop')">
+        <button onmousedown="startSendingCommand('LeftFlipOut')" onmouseup="stopSendingCommand('LeftFlipOut')" 
+                ontouchstart="startSendingCommand('LeftFlipOut')" ontouchend="stopSendingCommand('LeftFlipOut')">
             Left Flip Out
         </button>
-        <button onmousedown="sendMomentaryCommand('leftFlipIn', 'start')" onmouseup="sendMomentaryCommand('leftFlipIn', 'stop')" 
-                ontouchstart="sendMomentaryCommand('leftFlipIn', 'start')" ontouchend="sendMomentaryCommand('leftFlipIn', 'stop')">
+        <button onmousedown="startSendingCommand('leftFlipIn')" onmouseup="stopSendingCommand('leftFlipIn')" 
+                ontouchstart="startSendingCommand('leftFlipIn')" ontouchend="stopSendingCommand('leftFlipIn')">
             Left Flip In
         </button>
-        <button onmousedown="sendMomentaryCommand('leftLift', 'start')" onmouseup="sendMomentaryCommand('leftLift', 'stop')" 
-                ontouchstart="sendMomentaryCommand('leftLift', 'start')" ontouchend="sendMomentaryCommand('leftLift', 'stop')">
+        <button onmousedown="startSendingCommand('leftLift')" onmouseup="stopSendingCommand('leftLift')" 
+                ontouchstart="startSendingCommand('leftLift')" ontouchend="stopSendingCommand('leftLift')">
             Left Lift
         </button>
-        <button onmousedown="sendMomentaryCommand('leftLower', 'start')" onmouseup="sendMomentaryCommand('leftLower', 'stop')" 
-                ontouchstart="sendMomentaryCommand('leftLower', 'start')" ontouchend="sendMomentaryCommand('leftLower', 'stop')">
+        <button onmousedown="startSendingCommand('leftLower')" onmouseup="stopSendingCommand('leftLower')" 
+                ontouchstart="startSendingCommand('leftLower')" ontouchend="stopSendingCommand('leftLower')">
             Left Lower
         </button>
-        <button onmousedown="sendMomentaryCommand('Button5', 'start')" onmouseup="sendMomentaryCommand('Button5', 'stop')" 
-                ontouchstart="sendMomentaryCommand('Button5', 'start')" ontouchend="sendMomentaryCommand('Button5', 'stop')">
+        <button onmousedown="startSendingCommand('Button5')" onmouseup="stopSendingCommand('Button5')" 
+                ontouchstart="startSendingCommand('Button5')" ontouchend="stopSendingCommand('Button5')">
             Left Fold Out
         </button>
-        <button onmousedown="sendMomentaryCommand('Button6', 'start')" onmouseup="sendMomentaryCommand('Button6', 'stop')" 
-                ontouchstart="sendMomentaryCommand('Button6', 'start')" ontouchend="sendMomentaryCommand('Button6', 'stop')">
+        <button onmousedown="startSendingCommand('Button6')" onmouseup="stopSendingCommand('Button6')" 
+                ontouchstart="startSendingCommand('Button6')" ontouchend="stopSendingCommand('Button6')">
             Left Fold In
         </button>
-        <button onmousedown="sendMomentaryCommand('Button7', 'start')" onmouseup="sendMomentaryCommand('Button7', 'stop')" 
-                ontouchstart="sendMomentaryCommand('Button7', 'start')" ontouchend="sendMomentaryCommand('Button7', 'stop')">
+        <button onmousedown="startSendingCommand('Button7')" onmouseup="stopSendingCommand('Button7')" 
+                ontouchstart="startSendingCommand('Button7')" ontouchend="stopSendingCommand('Button7')">
             Center Raise
         </button>
-        <button onmousedown="sendMomentaryCommand('Button8', 'start')" onmouseup="sendMomentaryCommand('Button8', 'stop')" 
-                ontouchstart="sendMomentaryCommand('Button8', 'start')" ontouchend="sendMomentaryCommand('Button8', 'stop')">
+        <button onmousedown="startSendingCommand('Button8')" onmouseup="stopSendingCommand('Button8')" 
+                ontouchstart="startSendingCommand('Button8')" ontouchend="stopSendingCommand('Button8')">
             Center Lower
         </button>
-        <button onmousedown="sendMomentaryCommand('Button9', 'start')" onmouseup="sendMomentaryCommand('Button9', 'stop')" 
-                ontouchstart="sendMomentaryCommand('Button9', 'start')" ontouchend="sendMomentaryCommand('Button9', 'stop')">
+        <button onmousedown="startSendingCommand('Button9')" onmouseup="stopSendingCommand('Button9')" 
+                ontouchstart="startSendingCommand('Button9')" ontouchend="stopSendingCommand('Button9')">
             Right Fold Out
         </button>
-        <button onmousedown="sendMomentaryCommand('Button10', 'start')" onmouseup="sendMomentaryCommand('Button10', 'stop')" 
-                ontouchstart="sendMomentaryCommand('Button10', 'start')" ontouchend="sendMomentaryCommand('Button10', 'stop')">
+        <button onmousedown="startSendingCommand('Button10')" onmouseup="stopSendingCommand('Button10')" 
+                ontouchstart="startSendingCommand('Button10')" ontouchend="stopSendingCommand('Button10')">
             Right Fold In
         </button>
-        <button onmousedown="sendMomentaryCommand('Button11', 'start')" onmouseup="sendMomentaryCommand('Button11', 'stop')" 
-                ontouchstart="sendMomentaryCommand('Button11', 'start')" ontouchend="sendMomentaryCommand('Button11', 'stop')">
+        <button onmousedown="startSendingCommand('Button11')" onmouseup="stopSendingCommand('Button11')" 
+                ontouchstart="startSendingCommand('Button11')" ontouchend="stopSendingCommand('Button11')">
             Right Lift
         </button>
-        <button onmousedown="sendMomentaryCommand('Button12', 'start')" onmouseup="sendMomentaryCommand('Button12', 'stop')" 
-                ontouchstart="sendMomentaryCommand('Button12', 'start')" ontouchend="sendMomentaryCommand('Button12', 'stop')">
+        <button onmousedown="startSendingCommand('Button12')" onmouseup="stopSendingCommand('Button12')" 
+                ontouchstart="startSendingCommand('Button12')" ontouchend="stopSendingCommand('Button12')">
             Right Lower
         </button>
-        <button onmousedown="sendMomentaryCommand('Button13', 'start')" onmouseup="sendMomentaryCommand('Button13', 'stop')" 
-                ontouchstart="sendMomentaryCommand('Button13', 'start')" ontouchend="sendMomentaryCommand('Button13', 'stop')">
+        <button onmousedown="startSendingCommand('Button13')" onmouseup="stopSendingCommand('Button13')" 
+                ontouchstart="startSendingCommand('Button13')" ontouchend="stopSendingCommand('Button13')">
             Right Flip Out
         </button>
-        <button onmousedown="sendMomentaryCommand('Button14', 'start')" onmouseup="sendMomentaryCommand('Button14', 'stop')" 
-                ontouchstart="sendMomentaryCommand('Button14', 'start')" ontouchend="sendMomentaryCommand('Button14', 'stop')">
+        <button onmousedown="startSendingCommand('Button14')" onmouseup="stopSendingCommand('Button14')" 
+                ontouchstart="startSendingCommand('Button14')" ontouchend="stopSendingCommand('Button14')">
             Right Flip In
         </button>
         
@@ -187,13 +187,58 @@
                 .catch(error => console.error(`Error sending command for ${command}:`, error));
         }
 
+        let intervalId = null; // To store the interval ID
+
         // Function to send a momentary command to the controller
         function sendMomentaryCommand(button, action) {
             console.log(`Sending momentary command: ${button} - ${action}`);
-            fetch(`/momentary/${button}/${action}`, { method: 'POST' })
+            fetch(`/momentary?button=${button}&action=${action}`, { method: 'POST' })
                 .then(response => response.text())
                 .then(data => console.log(`Response from controller: ${data}`))
                 .catch(error => console.error(`Error sending momentary command for ${button}:`, error));
+        }
+
+        // Function to start sending commands repeatedly
+        function startSendingCommand(button) {
+            sendMomentaryCommand(button, 'start'); // Send the first command immediately
+            intervalId = setInterval(() => {
+                sendMomentaryCommand(button, 'start');
+            }, 500); // Repeat every 500ms
+        }
+
+        // Function to stop sending commands
+        function stopSendingCommand(button) {
+            clearInterval(intervalId); // Stop the interval
+            intervalId = null;
+            sendMomentaryCommand(button, 'stop'); // Send the stop command
+        }
+
+        let toggleIntervals = {}; // To store interval IDs for each toggle switch
+
+        // Function to send a toggle command repeatedly
+        function startToggleCommand(command) {
+            console.log(`Starting toggle command: ${command}`);
+            sendCommand(command, true); // Send the first "on" command immediately
+            toggleIntervals[command] = setInterval(() => {
+                sendCommand(command, true); // Repeat the "on" command every 500ms
+            }, 500);
+        }
+
+        // Function to stop sending toggle commands
+        function stopToggleCommand(command) {
+            console.log(`Stopping toggle command: ${command}`);
+            clearInterval(toggleIntervals[command]); // Stop the interval
+            delete toggleIntervals[command]; // Remove the interval ID
+            sendCommand(command, false); // Send the "off" command
+        }
+
+        // Function to handle toggle switch changes
+        function handleToggleChange(command, isChecked) {
+            if (isChecked) {
+                startToggleCommand(command); // Start sending commands if toggled on
+            } else {
+                stopToggleCommand(command); // Stop sending commands if toggled off
+            }
         }
     </script>
 </body>

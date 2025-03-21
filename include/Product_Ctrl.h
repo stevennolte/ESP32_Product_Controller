@@ -13,6 +13,7 @@ class Product_Ctrl{
         void begin();
         
     private:
+        float lpmConversion = 0.26417287472922;    
         static void taskHandler(void *param);  // Task handler
         void continuousLoop();  // Function to run in the background task
 

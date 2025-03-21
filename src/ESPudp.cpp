@@ -12,7 +12,8 @@ void ESPudp::begin(){
     udp.onPacket([this](AsyncUDPPacket packet) {
         if (packet.data()[0]==0x80 && packet.data()[1]==0x81){
         //   espConfig.udpTimer = millis();
-          switch (packet.data()[3]){
+        
+        switch (packet.data()[3]){
             case 200:  //Hello from AgIO
               // TODO: Send back a hello packet
               break;
@@ -24,7 +25,23 @@ void ESPudp::begin(){
               espConfig->updateIP();
               ESP.restart();
               break;
-            
+            case 254:
+              //TODO: Set Speed
+              espConfig->rateData.speed = (float((packet.data()[6] << 8) |  packet.data()[5])/10.0)*0.621371;
+              break;
+            case 229:
+              espConfig->rateData.lastSectionMsg = millis();
+              uint8_t _length = packet.data()[4];
+              uint8_t bitIndex = 0;
+              for (size_t i = 5; i<7; i++){
+                
+                uint8_t _byte = packet.data()[i];
+                for (int bit = 0; bit <= 7; bit++) { // Extract bits from MSB to LSB
+                  espConfig->rateData.sectionStates[bitIndex] = (_byte >> bit) & 0x01; // Shift and mask to get the bit
+                  bitIndex++;
+                }
+              }
+              break;
           }
         }
     });

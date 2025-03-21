@@ -72,34 +72,104 @@ uint8_t ESPconfig::loadConfig(){
         token = strtok(NULL, ".");
     }
     // i2cDefs.ADS_ADDRESS = uint8_t(doc["adsAddress"]);
-    
+    rateData.targetRate = doc["targetRate"];
     return 1;
 }
 
-uint8_t ESPconfig::updateIP(){
-    File file = LittleFS.open("/config.json","r");
+uint8_t ESPconfig::updateRate() {
+    // Open the file in read mode to load the existing JSON
+    File file = LittleFS.open("/config.json", "r");
     if (!file) {
+        Serial.println(F("Failed to open file for reading"));
         return 3;
     }
+
+    // Read the existing JSON data
     String jsonString;
-    while (file.available()){
+    while (file.available()) {
         jsonString += char(file.read());
+        yield(); // Yield control to reset the watchdog
     }
-    JsonDocument doc;
+    file.close(); // Close the file after reading
+
+    // Parse the JSON data
+    StaticJsonDocument<512> doc; // Ensure the size is sufficient for your JSON
     DeserializationError error = deserializeJson(doc, jsonString);
-    if (error){
+    if (error) {
+        Serial.println(F("Failed to parse JSON"));
         return 4;
     }
-    for (int i = 0; i < 4; i++){
-        doc["ipAddress"][i] = wifiCfg.ips[i];
+
+    // Update the "targetRate" field
+    doc["targetRate"] = rateData.targetRate;
+
+    // Open the file in write mode to save the updated JSON
+    file = LittleFS.open("/config.json", "w");
+    if (!file) {
+        Serial.println(F("Failed to open file for writing"));
+        return 3;
     }
+
+    // Serialize the updated JSON and write it to the file
     if (serializeJson(doc, file) == 0) {
         Serial.println(F("Failed to write to file"));
-      }
+        file.close();
+        return 5;
+    }
 
-      // Close the file
-      file.close();
-      return true;
+    // Close the file
+    file.close();
+    Serial.println(F("Successfully updated targetRate in config.json"));
+    return 1; // Success
+}
+
+uint8_t ESPconfig::updateIP() {
+    // Open the file in read mode to load the existing JSON
+    File file = LittleFS.open("/config.json", "r");
+    if (!file) {
+        Serial.println(F("Failed to open file for reading"));
+        return 3;
+    }
+
+    // Read the existing JSON data
+    String jsonString;
+    while (file.available()) {
+        jsonString += char(file.read());
+        yield(); // Yield control to reset the watchdog
+    }
+    file.close(); // Close the file after reading
+
+    // Parse the JSON data
+    StaticJsonDocument<512> doc; // Ensure the size is sufficient for your JSON
+    DeserializationError error = deserializeJson(doc, jsonString);
+    if (error) {
+        Serial.println(F("Failed to parse JSON"));
+        return 4;
+    }
+
+    // Update the "ipAddress" field
+    for (int i = 0; i < 4; i++) {
+        doc["ipAddress"][i] = wifiCfg.ips[i];
+    }
+
+    // Open the file in write mode to save the updated JSON
+    file = LittleFS.open("/config.json", "w");
+    if (!file) {
+        Serial.println(F("Failed to open file for writing"));
+        return 3;
+    }
+
+    // Serialize the updated JSON and write it to the file
+    if (serializeJson(doc, file) == 0) {
+        Serial.println(F("Failed to write to file"));
+        file.close();
+        return 5;
+    }
+
+    // Close the file
+    file.close();
+    Serial.println(F("Successfully updated ipAddress in config.json"));
+    return 1; // Success
 }
 
 uint8_t ESPconfig::updateServer(){

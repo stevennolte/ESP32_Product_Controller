@@ -243,9 +243,20 @@
 
     // Function to fetch and update performance variables and their targets
     function updatePerformanceVariables() {
+        console.log('Fetching performance variables...');
         fetch('/performance/variables') // Replace with the correct endpoint
-            .then(response => response.json())
-            .then(data => {
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.text(); // Read the response as text
+            })
+            .then(text => {
+                if (!text) {
+                    throw new Error('Empty response from server');
+                }
+                const data = JSON.parse(text); // Parse the JSON manually
+                console.log('Performance variables fetched:', data);
                 // Update each progress bar dynamically
                 Object.keys(data).forEach(variable => {
                     const progressBar = document.getElementById(`${variable}Progress`);
@@ -275,32 +286,22 @@
         }
 
         console.log(`Setting Application Rate to: ${applicationRate}`);
-        fetch('/applicationRate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ rate: applicationRate }),
-        })
-            .then(response => response.text())
-            .then(data => {
-                console.log(`Response from controller: ${data}`);
-                alert('Application Rate set successfully!');
-            })
-            .catch(error => console.error('Error setting Application Rate:', error));
+        fetch(`/setApplicationRate?rate=${applicationRate}`, { method: 'POST' })
+                .then(response => response.text())
+                .then(data => console.log(`Response from controller: ${data}`))
+                .catch(error => console.error(`Error sending momentary command for ${button}:`, error));
     }
 
     
-    // Update the displayed simulation value when the slider changes
-    document.getElementById('simulationInput').addEventListener('input', (event) => {
-        const simulationValue = document.getElementById('simulationValue');
-        simulationValue.textContent = event.target.value;
-    });
+    
 
     // Fetch the current states and performance variables when the page loads
     document.addEventListener('DOMContentLoaded', () => {
         getEnableState();
         getNarrowBoomState();
         updatePerformanceVariables();
-        setInterval(updatePerformanceVariables, 1000); // Refresh every 5 seconds
+        const intervalId = setInterval(updatePerformanceVariables, 1000); // Refresh every second
+        console.log('Interval ID:', intervalId);
     });
 </script>
 <script>
@@ -339,6 +340,24 @@
         setInterval(updateModuleState, 5000); // Refresh every 5 seconds
     });
 </script>
+<script>
+    // Function to fetch the current application rate from the device
+    function getApplicationRate() {
+        fetch('/getApplicationRate') // Replace with the correct endpoint
+            .then(response => response.json())
+            .then(data => {
+                const applicationRateInput = document.getElementById('applicationRateInput');
+                applicationRateInput.value = data.rate.toFixed(2); // Set the input field with the fetched rate
+                console.log(`Application Rate fetched: ${data.rate}`);
+            })
+            .catch(error => console.error('Error fetching application rate:', error));
+    }
+
+    // Fetch the current application rate when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        getApplicationRate();
+    });
+</script>
 <body>
     <nav>
         <a href="boom.html">Boom Control</a>
@@ -354,13 +373,7 @@
         </label>
         <span class="switch-label">Enable</span>
     </div>
-    <div class="switch-container">
-        <label class="switch">
-            <input type="checkbox" id="narrowBoomSwitch" onchange="toggleNarrowBoom(event)">
-            <span class="slider"></span>
-        </label>
-        <span class="switch-label">Narrow Boom</span>
-    </div>
+    
     <div class="separator"></div>
     <div class="input-container">
         <label for="applicationRateInput" class="input-label">Application Rate:</label>

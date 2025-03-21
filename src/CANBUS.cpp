@@ -5,6 +5,19 @@ CANBUS::CANBUS(ESPconfig* vars) {
     espConfig = vars;
 }
 
+void CANBUS::taskHandler(void *param) {
+    // Cast the param back to the ClassA object
+    CANBUS *instance = static_cast<CANBUS *>(param);
+    instance->continuousLoop();  // Call the member function
+}
+
+void CANBUS::continuousLoop() {
+    while (true) {
+        receiveCAN();
+        vTaskDelay(10/portTICK_PERIOD_MS);
+    }
+}
+
 void CANBUS::handle_tx_message(twai_message_t message)
     {
       esp_err_t result = twai_transmit(&message, pdMS_TO_TICKS(100));
@@ -29,7 +42,7 @@ void CANBUS::sendCAN(uint32_t identifier, uint8_t data[], uint8_t data_length_co
     handle_tx_message(message);
     }
     
-void CANBUS::begin(){
+uint8_t CANBUS::begin(){
     twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT((gpio_num_t)espConfig->gpioDefs.CAN_TX, (gpio_num_t)espConfig->gpioDefs.CAN_RX, TWAI_MODE_NO_ACK);  // TWAI_MODE_NORMAL, TWAI_MODE_NO_ACK or TWAI_MODE_LISTEN_ONLY
       twai_timing_config_t t_config  = TWAI_TIMING_CONFIG_250KBITS();
       twai_filter_config_t f_config  = TWAI_FILTER_CONFIG_ACCEPT_ALL();
@@ -39,7 +52,7 @@ void CANBUS::begin(){
         printf("Driver started\n");
     } else {
         printf("Failed to start driver\n");
-        return;
+        return 2;
     }
       
       twai_status_info_t status;
@@ -51,18 +64,39 @@ void CANBUS::begin(){
         sendCAN(0x18EC0001,ack,8);
         delay(100);
       }
+      delay(1000);
+      espConfig->regData.regCommand.regCommandStruct.byte_1 = 0x22;
+      espConfig->regData.regCommand.regCommandStruct.dic_index_1 = 0x07;
+      espConfig->regData.regCommand.regCommandStruct.dic_index_2 = 0x20;
+      espConfig->regData.regCommand.regCommandStruct.sub_index = 0x00;
+      espConfig->regData.regCommand.regCommandStruct.byte_5 = 0x04;
+      espConfig->regData.regCommand.regCommandStruct.movement_speed = espConfig->regData.speed;
+      espConfig->regData.regCommand.regCommandStruct.target = 01;
+      sendCAN(espConfig->regData.cmdID, espConfig->regData.regCommand.bytes, 8);
+      return 1;
       // transmit_normal_message(0x06FF3A01, ack);
 
 }
 
 
 
-    void CANBUS::receiveCAN()
-    {
-        twai_message_t message;
-        if (twai_receive(&message, pdMS_TO_TICKS(10)) == ESP_OK) {
+void CANBUS::receiveCAN()
+{
+    twai_message_t message;
+    if (twai_receive(&message, pdMS_TO_TICKS(10)) == ESP_OK) {
+      espConfig->regData.regID.regID_Struct.id = message.identifier;
+      
+      if (espConfig->regData.regID.bytes[1]==56 & espConfig->regData.regID.bytes[2] == 255){
+        
+        for (int i = 0; i<sizeof(espConfig->regData.regReport);i++){
+          espConfig->regData.regReport.bytes[i]=message.data[i];
         }
-  
+        espConfig->regData.lastMsgRecieved = millis();
+      }
     }
+
+}
+
+    
 
     
