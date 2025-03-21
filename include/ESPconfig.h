@@ -21,10 +21,10 @@ public:
             uint8_t SCL_PIN = 42;
             uint8_t SDA_H_PIN = 5;
             uint8_t SCL_H_PIN = 6;
-            uint8_t CAN_RX = 1;
-            uint8_t CAN_TX = 2;
-            uint8_t FLOW_PIN = 34;
-            uint8_t sectionPins[5] = {14, 13, 12, 11, 10};
+            uint8_t CAN_RX = 2;
+            uint8_t CAN_TX = 1;
+            uint8_t FLOW_PIN = 14;
+            uint8_t sectionPins[5] = {13, 12, 11, 10, 9};
             GPIO_Definitions(){}
     };
     GPIO_Definitions gpioDefs;
