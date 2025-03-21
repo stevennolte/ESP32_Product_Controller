@@ -28,6 +28,7 @@ void Product_Ctrl::taskHandler(void *param){
 
 void Product_Ctrl::continuousLoop(){
     while (true){
+        
         if (millis()-espConfig->rateData.lastSectionMsg > 2000){
             for (uint8_t i = 1; i<65; i++){
                 espConfig->rateData.sectionStates[i] = 0;

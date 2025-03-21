@@ -137,6 +137,31 @@ public:
     };
     RegData regData;
 
+    // class JoystickData {
+    //     public:
+    //         uint8_t state;
+    //         uint32_t lastMsgRecieved;
+    //         uint8_t switchStates[8];
+    //         JoystickData(){}
+    // };
+    // JoystickData joystickData;
+
+    class FoldData {
+        public:
+            uint8_t state;
+            uint32_t lastMsgRecieved;
+            uint8_t foldStates[7];
+            uint8_t leftFlip = 0;
+            uint8_t leftLift = 1;
+            uint8_t leftFold = 2;
+            uint8_t center = 3;
+            uint8_t rightFold = 4;
+            uint8_t rightLift = 5;
+            uint8_t rightFlip = 6;
+            FoldData(){}
+    } foldData;
+
+
     class RateData {
         public:
             uint32_t lastSectionMsg;

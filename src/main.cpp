@@ -95,7 +95,14 @@ void updateDebugVars() {
   debugVars.push_back("Target Row Flow Rate: " + String(espConfig.rateData.targetRowFlowRate));
   debugVars.push_back("Speed: " + String(espConfig.rateData.speed));
   debugVars.push_back("Last Section Msg: " + String(espConfig.rateData.lastSectionMsg));
-  
+  debugVars.push_back("Fold State 1: " + String(espConfig.foldData.foldStates[0]));
+  debugVars.push_back("Fold State 2: " + String(espConfig.foldData.foldStates[1]));
+  debugVars.push_back("Fold State 3: " + String(espConfig.foldData.foldStates[2]));
+  debugVars.push_back("Fold State 4: " + String(espConfig.foldData.foldStates[3]));
+  debugVars.push_back("Fold State 5: " + String(espConfig.foldData.foldStates[4]));
+  debugVars.push_back("Fold State 6: " + String(espConfig.foldData.foldStates[5]));
+  debugVars.push_back("Fold State 7: " + String(espConfig.foldData.foldStates[6]));
+  debugVars.push_back("Fold State 8: " + String(espConfig.foldData.foldStates[7]));
   
 
   String sipValue = String(wifiCfg.ips[0])+"."+String(wifiCfg.ips[1])+"."+String(wifiCfg.ips[2])+"."+String(wifiCfg.ips[3]);
@@ -192,19 +199,123 @@ void handleMomentaryCommand(AsyncWebServerRequest *request) {
     Serial.printf("Momentary Command: Button=%s, Action=%s\n", button.c_str(), action.c_str());
 
     // Add your logic here to handle the momentary button actions
-    if (button == "LeftFlipOut") {
+    // LEFT FLIP 
+    if (button == "leftFlipOut") {
       if (action == "start") {
-        // Start the action for LeftFlipOut
-        Serial.println("Starting LeftFlipOut");
-        // Add hardware control logic here
+        espConfig.foldData.foldStates[espConfig.foldData.leftFlip] = 1;
+        
       } else if (action == "stop") {
-        // Stop the action for LeftFlipOut
-        Serial.println("Stopping LeftFlipOut");
-        // Add hardware control logic here
+        espConfig.foldData.foldStates[espConfig.foldData.leftFlip] = 0;
       } else {
         Serial.println("Unknown action received for LeftFlipOut.");
       }
+    } else if (button == "leftFlipIn") {
+      if (action == "start") {
+        espConfig.foldData.foldStates[espConfig.foldData.leftFlip] = 2;
+      } else if (action == "stop") {
+        espConfig.foldData.foldStates[espConfig.foldData.leftFlip] = 0;
+      } else {
+        Serial.println("Unknown action received for LeftFlipIn.");
+      }
+    } else if (button == "leftLiftUp") {
+      if (action == "start") {
+        espConfig.foldData.foldStates[espConfig.foldData.leftLift] = 1;
+      } else if (action == "stop") {
+        espConfig.foldData.foldStates[espConfig.foldData.leftLift] = 0;
+      } else {
+        Serial.println("Unknown action received for LeftLiftOut.");
+      }
+    } else if (button == "leftLiftDown") {
+      if (action == "start") {
+        espConfig.foldData.foldStates[espConfig.foldData.leftLift] = 2;
+      } else if (action == "stop") {
+        espConfig.foldData.foldStates[espConfig.foldData.leftLift] = 0;
+      } else {
+        Serial.println("Unknown action received for LeftLiftIn.");
+      }
+    } else if (button == "leftFoldOut") {
+      if (action == "start") {
+        espConfig.foldData.foldStates[espConfig.foldData.leftFold] = 1;
+      } else if (action == "stop") {
+        espConfig.foldData.foldStates[espConfig.foldData.leftFold] = 0;
+      } else {
+        Serial.println("Unknown action received for LeftFoldOut.");
+      }
+    } else if (button == "leftFoldIn") {
+      if (action == "start") {
+        espConfig.foldData.foldStates[espConfig.foldData.leftFold] = 2;
+      } else if (action == "stop") {
+        espConfig.foldData.foldStates[espConfig.foldData.leftFold] = 0;
+      } else {
+        Serial.println("Unknown action received for LeftFoldIn.");
+      }
+    } else if (button == "centerUp") {
+      if (action == "start") {
+        espConfig.foldData.foldStates[espConfig.foldData.center] = 1;
+      } else if (action == "stop") {
+        espConfig.foldData.foldStates[espConfig.foldData.center] = 0;
+      } else {
+        Serial.println("Unknown action received for CenterOut.");
+      }
+    } else if (button == "centerDown") {
+      if (action == "start") {
+        espConfig.foldData.foldStates[espConfig.foldData.center] = 2;
+      } else if (action == "stop") {
+        espConfig.foldData.foldStates[espConfig.foldData.center] = 0;
+      } else {
+        Serial.println("Unknown action received for CenterIn.");
+      }
+    } else if (button == "rightFoldOut") {
+      if (action == "start") {
+        espConfig.foldData.foldStates[espConfig.foldData.rightFold] = 1;
+      } else if (action == "stop") {
+        espConfig.foldData.foldStates[espConfig.foldData.rightFold] = 0;
+      } else {
+        Serial.println("Unknown action received for RightFoldOut.");
+      }
+    } else if (button == "rightFoldIn") {
+      if (action == "start") {
+        espConfig.foldData.foldStates[espConfig.foldData.rightFold] = 2;
+      } else if (action == "stop") {
+        espConfig.foldData.foldStates[espConfig.foldData.rightFold] = 0;
+      } else {
+        Serial.println("Unknown action received for RightFoldIn.");
+      }
+    } else if (button == "rightLiftUp") {
+      if (action == "start") {
+        espConfig.foldData.foldStates[espConfig.foldData.rightLift] = 1;
+      } else if (action == "stop") {
+        espConfig.foldData.foldStates[espConfig.foldData.rightLift] = 0;
+      } else {
+        Serial.println("Unknown action received for RightLiftOut.");
+      }
+    } else if (button == "rightLiftDown") {
+      if (action == "start") {
+        espConfig.foldData.foldStates[espConfig.foldData.rightLift] = 2;
+      } else if (action == "stop") {
+        espConfig.foldData.foldStates[espConfig.foldData.rightLift] = 0;
+      } else {
+        Serial.println("Unknown action received for RightLiftIn.");
+      }
+    } else if (button == "rightFlipOut") {
+      if (action == "start") {
+        espConfig.foldData.foldStates[espConfig.foldData.rightFlip] = 1;
+      } else if (action == "stop") {
+        espConfig.foldData.foldStates[espConfig.foldData.rightFlip] = 0;
+      } else {
+        Serial.println("Unknown action received for RightFlipOut.");
+      }
+    } else if (button == "rightFlipIn") {
+      if (action == "start") {
+        espConfig.foldData.foldStates[espConfig.foldData.rightFlip] = 2;
+      } else if (action == "stop") {
+        espConfig.foldData.foldStates[espConfig.foldData.rightFlip] = 0;
+      } else {
+        Serial.println("Unknown action received for RightFlipIn.");
+      }
     } else {
+
+
       Serial.println("Unknown button received.");
     }
 
