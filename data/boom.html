@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boom Control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .switch-label {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 columns */
+            gap: 10px; /* Spacing between buttons */
+            margin-top: 20px;
+        }
+        .button-grid button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .button-grid button:hover {
+            background-color: #45a049;
+        }
+        .button-grid button:active {
+            background-color: #3e8e41;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="boom.html">Boom Control</a>
+        <a href="product.html">Product Control</a>
+        <a href="debug.html">Debug</a>
+        <a href="settings.html">Settings</a>
+    </nav>
+    <h1>Boom Control</h1>
+    <div class="switch-container">
+        <label class="switch">
+            <input type="checkbox" id="foldOuterWings" onchange="sendCommand('foldOuterWings', this.checked)">
+            <span class="slider"></span>
+        </label>
+        <span class="switch-label">Fold Outer Wings</span>
+    </div>
+    <div class="switch-container">
+        <label class="switch">
+            <input type="checkbox" id="foldCenterWings" onchange="sendCommand('foldCenterWings', this.checked)">
+            <span class="slider"></span>
+        </label>
+        <span class="switch-label">Fold Center Wings</span>
+    </div>
+    <div class="switch-container">
+        <label class="switch">
+            <input type="checkbox" id="raiseWings" onchange="sendCommand('raiseWings', this.checked)">
+            <span class="slider"></span>
+        </label>
+        <span class="switch-label">Raise Wings</span>
+    </div>
+    <div class="button-grid">
+        <button onmousedown="sendMomentaryCommand('buttonLeftFlipOut', 'start')" onmouseup="sendMomentaryCommand('buttonLeftFlipOut', 'stop')" 
+                ontouchstart="sendMomentaryCommand('buttonLeftFlipOut', 'start')" ontouchend="sendMomentaryCommand('buttonLeftFlipOut', 'stop')">
+            Left Flip Out
+        </button>
+        <button onmousedown="sendMomentaryCommand('leftFlipIn', 'start')" onmouseup="sendMomentaryCommand('leftFlipIn', 'stop')" 
+                ontouchstart="sendMomentaryCommand('leftFlipIn', 'start')" ontouchend="sendMomentaryCommand('leftFlipIn', 'stop')">
+            Left Flip In
+        </button>
+        <button onmousedown="sendMomentaryCommand('leftLift', 'start')" onmouseup="sendMomentaryCommand('leftLift', 'stop')" 
+                ontouchstart="sendMomentaryCommand('leftLift', 'start')" ontouchend="sendMomentaryCommand('leftLift', 'stop')">
+            Left Lift
+        </button>
+        <button onmousedown="sendMomentaryCommand('leftLower', 'start')" onmouseup="sendMomentaryCommand('leftLower', 'stop')" 
+                ontouchstart="sendMomentaryCommand('leftLower', 'start')" ontouchend="sendMomentaryCommand('leftLower', 'stop')">
+            Left Lower
+        </button>
+        <button onmousedown="sendMomentaryCommand('Button5', 'start')" onmouseup="sendMomentaryCommand('Button5', 'stop')" 
+                ontouchstart="sendMomentaryCommand('Button5', 'start')" ontouchend="sendMomentaryCommand('Button5', 'stop')">
+            Left Fold Out
+        </button>
+        <button onmousedown="sendMomentaryCommand('Button6', 'start')" onmouseup="sendMomentaryCommand('Button6', 'stop')" 
+                ontouchstart="sendMomentaryCommand('Button6', 'start')" ontouchend="sendMomentaryCommand('Button6', 'stop')">
+            Left Fold In
+        </button>
+        <button onmousedown="sendMomentaryCommand('Button7', 'start')" onmouseup="sendMomentaryCommand('Button7', 'stop')" 
+                ontouchstart="sendMomentaryCommand('Button7', 'start')" ontouchend="sendMomentaryCommand('Button7', 'stop')">
+            Center Raise
+        </button>
+        <button onmousedown="sendMomentaryCommand('Button8', 'start')" onmouseup="sendMomentaryCommand('Button8', 'stop')" 
+                ontouchstart="sendMomentaryCommand('Button8', 'start')" ontouchend="sendMomentaryCommand('Button8', 'stop')">
+            Center Lower
+        </button>
+        <button onmousedown="sendMomentaryCommand('Button9', 'start')" onmouseup="sendMomentaryCommand('Button9', 'stop')" 
+                ontouchstart="sendMomentaryCommand('Button9', 'start')" ontouchend="sendMomentaryCommand('Button9', 'stop')">
+            Right Fold Out
+        </button>
+        <button onmousedown="sendMomentaryCommand('Button10', 'start')" onmouseup="sendMomentaryCommand('Button10', 'stop')" 
+                ontouchstart="sendMomentaryCommand('Button10', 'start')" ontouchend="sendMomentaryCommand('Button10', 'stop')">
+            Right Fold In
+        </button>
+        <button onmousedown="sendMomentaryCommand('Button11', 'start')" onmouseup="sendMomentaryCommand('Button11', 'stop')" 
+                ontouchstart="sendMomentaryCommand('Button11', 'start')" ontouchend="sendMomentaryCommand('Button11', 'stop')">
+            Right Lift
+        </button>
+        <button onmousedown="sendMomentaryCommand('Button12', 'start')" onmouseup="sendMomentaryCommand('Button12', 'stop')" 
+                ontouchstart="sendMomentaryCommand('Button12', 'start')" ontouchend="sendMomentaryCommand('Button12', 'stop')">
+            Right Lower
+        </button>
+        <button onmousedown="sendMomentaryCommand('Button13', 'start')" onmouseup="sendMomentaryCommand('Button13', 'stop')" 
+                ontouchstart="sendMomentaryCommand('Button13', 'start')" ontouchend="sendMomentaryCommand('Button13', 'stop')">
+            Right Flip Out
+        </button>
+        <button onmousedown="sendMomentaryCommand('Button14', 'start')" onmouseup="sendMomentaryCommand('Button14', 'stop')" 
+                ontouchstart="sendMomentaryCommand('Button14', 'start')" ontouchend="sendMomentaryCommand('Button14', 'stop')">
+            Right Flip In
+        </button>
+        
+    </div>
+    <script>
+        // Function to send a command to the controller
+        function sendCommand(command, state) {
+            const action = state ? 'on' : 'off';
+            console.log(`Sending command: ${command} - ${action}`);
+            fetch(`/${command}/${action}`, { method: 'POST' })
+                .then(response => response.text())
+                .then(data => console.log(`Response from controller: ${data}`))
+                .catch(error => console.error(`Error sending command for ${command}:`, error));
+        }
+
+        // Function to send a momentary command to the controller
+        function sendMomentaryCommand(button, action) {
+            console.log(`Sending momentary command: ${button} - ${action}`);
+            fetch(`/momentary/${button}/${action}`, { method: 'POST' })
+                .then(response => response.text())
+                .then(data => console.log(`Response from controller: ${data}`))
+                .catch(error => console.error(`Error sending momentary command for ${button}:`, error));
+        }
+    </script>
+</body>
+</html>
